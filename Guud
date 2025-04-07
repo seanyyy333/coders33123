@@ -1,0 +1,43 @@
+ acronym_unit_schema:
+  type: object
+  properties:
+    acronym:
+      type: string
+      description: The acronym itself (e.g., "SIS").
+    triad:
+      type: array
+      items:
+        type: integer
+      description: The triadic mapping (e.g., [6, 1, 6]).
+      minItems: 3
+      maxItems: 3
+    symbolic_roles:
+      type: array
+      items:
+        type: string
+      description: The symbolic roles associated with the acronym (e.g., [Structure, Identity, Reflection]).
+    domains:
+      type: array
+      items:
+        type: string
+      description: The contextual domains the acronym belongs to (e.g., [Technology, Intelligence, Medical, Education, Business, Environmental]).
+    frequency_score:
+      type: integer
+      description: A numerical score representing the frequency of the acronym's usage.
+    polarity:
+      type: string
+      enum: [Helpful, Harmful, Dual]
+      description: The polarity of the acronym (Helpful, Harmful, or Dual).
+    transformation_triggers:
+      type: array
+      items:
+        type: string
+      description: Events or conditions that trigger actions related to the acronym (e.g., [Trust Shift, Surveillance Alert, Medical Event]).
+  required:
+    - acronym
+    - triad
+    - symbolic_roles
+    - domains
+    - frequency_score
+    - polarity
+    - transformation_triggers
