@@ -1,0 +1,71 @@
+import numpy as np
+
+# === Transformation Matrices ===
+T_flip = np.array([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])
+T_rotate_90 = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+T_rotate_45 = np.array([
+    [np.cos(np.pi/4), -np.sin(np.pi/4), 0],
+    [np.sin(np.pi/4),  np.cos(np.pi/4), 0],
+    [0, 0, 1]
+])
+T_rotate_180 = np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
+
+# === Simplified Letter Positions ===
+letter_positions = {
+    'A': np.array([1, 1, 2]),
+    'B': np.array([1, 1, 3]),
+    'C': np.array([1, 1, 1]),
+    'D': np.array([1, 1, 4]),
+    'E': np.array([0, 1, 2]),
+    'F': np.array([1, 1, 3]),
+    'H': np.array([1, 0, 1]),
+    'I': np.array([0, 0, 2]),
+    'M': np.array([1, 0, 3]),
+    'N': np.array([1, 0, 4]),
+    'O': np.array([0, 0, 1]),
+    'R': np.array([0, 1, 3]),
+    'L': np.array([0, 1, 4]),
+    'W': np.array([1, 0, 5])
+}
+
+# === Helpers ===
+def get_scaling_matrix(word):
+    vowel_count = sum(1 for letter in word.upper() if letter in "AEIOU")
+    scale = 1.5 if vowel_count > 2 else 1.0
+    return np.diag([scale, scale, scale])
+
+def extract_acronym(word):
+    return ''.join([c.upper() for c in word if c.isalpha()])
+
+def transform_word(word, matrix):
+    result = ""
+    for letter in word:
+        if letter.upper() in letter_positions:
+            pos = matrix @ letter_positions[letter.upper()]
+            closest = min(letter_positions, key=lambda k: np.linalg.norm(letter_positions[k] - pos))
+            result += closest
+        else:
+            result += letter
+    return result
+
+def transform_and_report(word, label, matrix):
+    transformed = transform_word(word, matrix)
+    acronym = extract_acronym(transformed)
+    print(f"[{label}] {word} → {transformed} → {acronym}")
+    return (word, transformed, acronym)
+
+# === Main Execution ===
+words_to_test = ["CAB", "LIME", "HEAR", "WORLD", "EXAMPLE", "COMPUTER"]
+
+transformations = {
+    "Rotate180": T_rotate_180,
+    "Rotate90": T_rotate_90,
+    "Flip": T_flip,
+    "Rotate45": T_rotate_45
+}
+
+for word in words_to_test:
+    scaling_matrix = get_scaling_matrix(word)
+    for name, matrix in transformations.items():
+        full_matrix = matrix @ scaling_matrix
+        transform_and_report(word, name, full_matrix)
