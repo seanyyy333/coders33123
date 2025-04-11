@@ -1,0 +1,98 @@
+import numpy as np
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Dict
+import uvicorn
+
+# --- Triadic Vector Mapping (Letter to 3D symbolic vector) ---
+LETTER_VECTORS = {
+    'A': np.array([1, 1, 2]),
+    'B': np.array([1, 1, 3]),
+    'C': np.array([1, 1, 1]),
+    'D': np.array([1, 1, 4]),
+    'E': np.array([0, 1, 2]),
+    'F': np.array([1, 1, 3]),
+    'H': np.array([1, 0, 1]),
+    'I': np.array([0, 0, 2]),
+    'M': np.array([1, 0, 3]),
+    'N': np.array([1, 0, 4]),
+    'O': np.array([0, 0, 1]),
+    'R': np.array([0, 1, 3]),
+    'L': np.array([0, 1, 4]),
+    'W': np.array([1, 0, 5])
+}
+
+# --- Transform Matrices ---
+T_ROTATE_180 = np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
+T_ROTATE_90 = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+T_FLIP = np.array([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])
+
+TRANSFORM_MAP = {
+    "rotate_180": T_ROTATE_180,
+    "rotate_90": T_ROTATE_90,
+    "flip": T_FLIP
+}
+
+# --- Input Schema ---
+class TransformRequest(BaseModel):
+    word: str
+    operation: str  # "rotate_180", "rotate_90", "flip"
+
+# --- Symbolic Transform Logic ---
+def transform_word(word: str, transform_matrix: np.ndarray) -> str:
+    transformed_word = ""
+    original_vecs = {}
+    transformed_vecs = {}
+
+    for letter in word.upper():
+        if letter in LETTER_VECTORS:
+            vec = LETTER_VECTORS[letter]
+            transformed_vec = transform_matrix @ vec
+            closest = min(LETTER_VECTORS.items(),
+                          key=lambda item: np.linalg.norm(item[1] - transformed_vec))[0]
+            transformed_word += closest
+            original_vecs[letter] = vec.tolist()
+            transformed_vecs[letter] = transformed_vec.tolist()
+        else:
+            transformed_word += letter
+
+    return transformed_word, original_vecs, transformed_vecs
+
+# --- Scoring Engine ---
+def symbolic_score(original: Dict[str, list], transformed: Dict[str, list]) -> float:
+    if not original or not transformed:
+        return 0.0
+    total_dist = sum(np.linalg.norm(np.array(original[k]) - np.array(transformed[k])) for k in original if k in transformed)
+    avg_dist = total_dist / len(original)
+    score = 1 / (1 + avg_dist)
+    return round(score, 3)
+
+# --- FastAPI App ---
+app = FastAPI()
+
+@app.post("/transform")
+def transform_handler(req: TransformRequest):
+    if req.operation not in TRANSFORM_MAP:
+        raise HTTPException(status_code=400, detail="Invalid operation type.")
+    matrix = TRANSFORM_MAP[req.operation]
+    transformed, original_vecs, transformed_vecs = transform_word(req.word, matrix)
+    score = symbolic_score(original_vecs, transformed_vecs)
+    return {
+        "original": req.word,
+        "transformed": transformed,
+        "vector_map": original_vecs,
+        "transformation": req.operation,
+        "metadata": {
+            "flip_depth": round(np.linalg.norm(matrix), 2),
+            "symbolic_score": score
+        }
+    }
+
+# --- Local dev server ---
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)
+pip install fastapi uvicorn numpy pydantic
+python symbolic_core.py
+curl -X POST http://localhost:8080/transform \
+  -H "Content-Type: application/json" \
+  -d '{"word": "WORLD", "operation": "rotate_180"}'
