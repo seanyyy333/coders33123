@@ -1,4 +1,4 @@
-.# Homebrew Docs
+# Homebrew Docs
 
 These are the source files for the [Homebrew documentation site](https://docs.brew.sh/).
 
@@ -49,21 +49,3 @@ If you are contributing to the documentation, you can build and preview the site
 ---
 
 *Note: Information about Homebrew commands (like `brew --version`), environment variables (`HOMEBREW_*`), shell completion setup, etc., are part of the *content* of the documentation site itself (<https://docs.brew.sh>) and are not prerequisites for building the site locally.*
-
-# 1. Navigate to the Homebrew docs directory
-echo "Changing directory to Homebrew docs..."
-cd "$(brew --repository)"/docs || exit 1 # Exit if cd fails
-
-# 2. Install Ruby gem dependencies
-echo "Installing dependencies with Bundler..."
-bundle install || exit 1 # Exit if bundle install fails
-
-# 3. Build the site and start the local server
-echo "Starting Jekyll server (http://localhost:4000)..."
-echo "Press Ctrl+C to stop."
-bundle exec jekyll serve --watch
-jekyll command [argument] [option] [argument_to_option]
-
-Examples:
-    jekyll new site/ --blank
-    jekyll serve --config _alternative_config.yml
