@@ -14,6 +14,7 @@ To instead generate the site locally to <http://localhost:4000>, run:
 cd `brew --repository`/docs
 bundle install
 bundle exec jekyll serve --watch
-
+brew --version
+brew command [--verbose|-v] [options] [formula] …
 
 
