@@ -62,4 +62,3 @@ bundle install || exit 1 # Exit if bundle install fails
 echo "Starting Jekyll server (http://localhost:4000)..."
 echo "Press Ctrl+C to stop."
 bundle exec jekyll serve --watch
-HOMEBREW_INSTALL_BADGE
