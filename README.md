@@ -16,5 +16,5 @@ bundle install
 bundle exec jekyll serve --watch
 brew --version
 brew command [--verbose|-v] [options] [formula] …
-
+xcode-select --install
 
