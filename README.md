@@ -42,29 +42,7 @@ If you are contributing to the documentation, you can build and preview the site
     # --watch automatically rebuilds the site when files change
     bundle exec jekyll serve --watch
     ```
-### Steps
 
-1.  **Navigate to the docs directory:**
-    ```bash
-    # Change directory to the 'docs' subdirectory within your local Homebrew repository
-    cd "$(brew --repository)"/docs
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    # Install the required Ruby gems specified in the Gemfile
-    bundle install
-    ```
-
-3.  **Build and serve the site:**
-    ```bash
-    # Start the local Jekyll development server
-    # --watch automatically rebuilds the site when files change
-    bundle exec jekyll serve --watch
-    ```
-
-4.  **View the local site:**
-    Open <http://localhost:4000> in your web browser. Press `Ctrl+C` in the terminal to stop the local server.
 4.  **View the local site:**
     Open <http://localhost:4000> in your web browser. Press `Ctrl+C` in the terminal to stop the local server.
 
