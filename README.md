@@ -62,3 +62,8 @@ bundle install || exit 1 # Exit if bundle install fails
 echo "Starting Jekyll server (http://localhost:4000)..."
 echo "Press Ctrl+C to stop."
 bundle exec jekyll serve --watch
+jekyll command [argument] [option] [argument_to_option]
+
+Examples:
+    jekyll new site/ --blank
+    jekyll serve --config _alternative_config.yml
