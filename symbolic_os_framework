@@ -1,0 +1,86 @@
+import os
+
+# --- Directory structure ---
+directories = [
+    'core',
+    'registry',
+    'interface',
+    'utils'
+]
+
+# Ensure directories exist
+for directory in directories:
+    os.makedirs(directory, exist_ok=True)
+
+# --- File content ---
+
+core_symbol_content = """from utils.embed import embed, cosine_similarity
+
+class Symbol:
+    def __init__(self, name, description, tags=None, behaviors=None, meta_tags=None):
+        self.name = name
+        self.description = description
+        self.embedding = embed(description)
+        self.tags = tags if tags else []
+        self.behaviors = behaviors if behaviors else {}
+        self.meta_tags = meta_tags if meta_tags else []
+
+    def run_behavior(self, event, context):
+        if event in self.behaviors:
+            return self.behaviors[event](context)
+        return None
+
+    def similarity(self, other_symbol):
+        return cosine_similarity(self.embedding, other_symbol.embedding)
+
+    def combine_with(self, other_symbol):
+        # Combine embeddings
+        combined_embedding = (self.embedding + other_symbol.embedding) / 2
+        # Combine tags and meta-tags
+        combined_tags = self.tags + other_symbol.tags
+        combined_meta_tags = self.meta_tags + other_symbol.meta_tags
+        # Combine behaviors
+        combined_behaviors = {**self.behaviors, **other_symbol.behaviors}
+        return Symbol(
+            name=f"{self.name}_{other_symbol.name}",
+            description=f"Combination of {self.description} and {other_symbol.description}",
+            tags=combined_tags,
+            behaviors=combined_behaviors,
+            meta_tags=combined_meta_tags
+        )
+"""
+
+core_behavior_content = """def mirror_behavior(ctx):
+    return f"Mirroring context: {ctx[::-1]}"
+"""
+
+utils_embed_content = """from transformers import AutoTokenizer, AutoModel
+import torch
+import numpy as np
+
+# Load embedding model (you can switch this to a sentence-transformer if needed)
+tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+model = AutoModel.from_pretrained("distilbert-base-uncased")
+
+def embed(text):
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
+
+def cosine_similarity(v1, v2):
+    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+"""
+
+# --- Write files ---
+
+with open(os.path.join('core', 'symbol.py'), 'w') as f:
+    f.write(core_symbol_content)
+
+with open(os.path.join('core', 'behaviors.py'), 'w') as f:
+    f.write(core_behavior_content)
+
+with open(os.path.join('utils', 'embed.py'), 'w') as f:
+    f.write(utils_embed_content)
+
+print("Symbolic OS framework created successfully.")
