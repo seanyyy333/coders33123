@@ -1,0 +1,20 @@
+# prompt: (macOS) Xcode Command Line Tools: Some gems may require build tools. Install them using xcode-select --install.
+
+import libarchive
+import pydot
+import cartopy
+from matplotlib_venn import venn2
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+# Example usage of venn2
+venn2(subsets = (10, 5, 2), set_labels = ('Group A', 'Group B'))
+plt.show()
+
+
+# You can now use the installed libraries without further installation commands.
+# For example, let's create a simple plot using cartopy:
+
+
+ax = plt.axes(projection=ccrs.PlateCarree())
+ax.stock_img()
+plt.show()
